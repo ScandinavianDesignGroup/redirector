@@ -2,6 +2,18 @@ require "net/http"
 
 task :default => [:compile, :minify, :test]
 
+task :release do
+  version = ENV['VERSION']
+  if version
+    puts "Writing version #{version} from current state"
+    Rake::Task[:compile].invoke()
+    Rake::Task[:minify].invoke()
+    FileUtils.cp('js/redirector.min.js', 'release/redirector-' + version + '.min.js')
+  else
+    puts "Specify VERSION with an env variable"
+  end
+end
+
 task :compile do
   puts "Compiling CoffeeScript to JavaScript..."
   `coffee -o js/ --compile redirector.coffee`
